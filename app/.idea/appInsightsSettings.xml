@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.voting_app" />
-                  <option name="mobileSdkAppId" value="1:309021041397:android:328427aa2d7bcc9d271bbc" />
-                  <option name="projectId" value="coding-c5469" />
-                  <option name="projectNumber" value="309021041397" />
+                  <option name="appId" value="com.example.hospitalmanagementsystempart2" />
+                  <option name="mobileSdkAppId" value="1:353081304464:android:30061a3cde38d4639b3f15" />
+                  <option name="projectId" value="hospital-management-data-e2dbd" />
+                  <option name="projectNumber" value="353081304464" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

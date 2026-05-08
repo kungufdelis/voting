@@ -18,3 +18,10 @@ data class ElectionModel(
     var title: String = "",
     var status: String = "OPEN"
 )
+
+data class CandidateModel(
+    var id: String = "",
+    var name: String = "",
+    var position: String = "",
+    var voteCount: Int = 0
+)

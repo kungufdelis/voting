@@ -1,130 +1,66 @@
-package com.example.votingapp.ui.auth
+package com.example.votingsystem.screens.login
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.example.possystem.navigation.ROUTE_REGISTER
-import com.example.votingapp.R
-import com.example.votingapp.auth.AuthViewModel
-import com.example.votingapp.navigation.ROUTE_REGISTER
+import androidx.navigation.compose.rememberNavController
+import com.example.voting_app.data.AuthViewModel
+
+
 
 @Composable
-fun LoginScreen(navController: NavController) {
-
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val authViewModel: AuthViewModel = viewModel()
     val context = LocalContext.current
+    val navController = rememberNavController()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF2196F3), Color(0xFF0D47A1))
-                )
-            )
-    ) {
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Login", style = MaterialTheme.typography.headlineMedium)
 
-            Image(
-                painter = painterResource(id = R.drawable.download),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-            )
+        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
 
-            Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Voting System Login",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+        Button(onClick = { onLoginSuccess() }) {
+            Text("Login")
+            authViewModel.login(email, password, navController, context)
+        }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // EMAIL
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                leadingIcon = { Icon(Icons.Default.Email, null) },
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth(0.85f)
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // PASSWORD
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                leadingIcon = { Icon(Icons.Default.Lock, null) },
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth(0.85f)
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // LOGIN BUTTON
-            Button(
-                onClick = {
-                    authViewModel.login(
-                        email = email,
-                        password = password,
-                        navController = navController,
-                        context = context
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(0.6f)
-            ) {
-                Text("Login")
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // REGISTER LINK
-            Row {
-                Text("Don't have an account? ", color = Color.White)
-                Text(
-                    text = "Register",
-                    color = Color.Yellow,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable {
-                        navController.navigate(ROUTE_REGISTER)
-                    }
-                )
-            }
+        TextButton(onClick = onNavigateToRegister) {
+            Text("No account? Register")
         }
     }
+}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginPreview() {
+    LoginScreen(
+        onLoginSuccess = {},
+        onNavigateToRegister = {}
+    )
+
 }

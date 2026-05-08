@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "309021041397",
+    "project_id": "coding-c5469",
+    "storage_bucket": "coding-c5469.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309021041397:android:328427aa2d7bcc9d271bbc",
+        "android_client_info": {
+          "package_name": "com.example.voting_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoirSV5_tBy2slUgj4coeUBJqllvNcwDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

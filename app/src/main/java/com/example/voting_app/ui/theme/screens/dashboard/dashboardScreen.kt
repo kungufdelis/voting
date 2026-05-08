@@ -1,127 +1,258 @@
-package com.example.votingapp.ui.dashboard
+package com.example.votingsystem.screens.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.HowToVote
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.votingapp.auth.AuthViewModel
-import com.example.votingapp.navigation.ROUTE_CANDIDATES
-import com.example.votingapp.navigation.ROUTE_RESULTS
+import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import com.example.voting_app.data.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(navController: NavController) {
 
-    val selectedItem = remember { mutableStateOf(0) }
+    var selectedItem by remember { mutableStateOf(0) }
+
     val authViewModel: AuthViewModel = viewModel()
     val context = LocalContext.current
 
     Scaffold(
-
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Voting System",
+                        text = "Voting Dashboard",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1976D2),
-                    titleContentColor = Color.White
-                ),
                 actions = {
                     IconButton(onClick = {
                         authViewModel.logout(navController, context)
                     }) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Logout",
+                            tint = Color.White
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF6A1B9A),
+                    titleContentColor = Color.White
+                )
             )
         },
 
         bottomBar = {
-            NavigationBar {
+            NavigationBar(containerColor = Color(0xFF6A1B9A)) {
                 NavigationBarItem(
-                    selected = selectedItem.value == 0,
-                    onClick = { selectedItem.value = 0 },
-                    icon = { Icon(Icons.Default.HowToVote, null) },
-                    label = { Text("Vote") }
+                    selected = selectedItem == 0,
+                    onClick = { selectedItem = 0 },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") }
                 )
-
                 NavigationBarItem(
-                    selected = selectedItem.value == 1,
-                    onClick = { selectedItem.value = 1 },
-                    icon = { Icon(Icons.Default.BarChart, null) },
-                    label = { Text("Results") }
+                    selected = selectedItem == 1,
+                    onClick = { selectedItem = 1 },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Manage") },
+                    label = { Text("Manage") }
                 )
-
                 NavigationBarItem(
-                    selected = selectedItem.value == 2,
-                    onClick = { selectedItem.value = 2 },
-                    icon = { Icon(Icons.Default.Person, null) },
+                    selected = selectedItem == 2,
+                    onClick = { selectedItem = 2 },
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") }
                 )
             }
         }
-
     ) { padding ->
 
         Column(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
 
             Text(
-                text = "Welcome to Online Voting",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D47A1)
+                text = "Election Overview",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // QUICK STATS
+            // Votes Summary Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Black)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text("Total Votes Cast", color = Color.Gray)
+                    Text(
+                        text = "1,245",
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text("Active Election: 2026 Student Leader", color = Color(0xFFBA68C8))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Action Cards
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                VoteCard("5", "Candidates")
-                VoteCard("120", "Votes Cast")
-                VoteCard("1", "Election")
+                ActionCard("Add Candidate", Modifier.weight(1f))
+                ActionCard("View Candidates", Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ActionCard("Update Candidate", Modifier.weight(1f))
+                ActionCard("Results", Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Simple Results Chart
+            Text(
+                text = "Live Results",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            val results = listOf(
+                "Alice" to 320f,
+                "John" to 280f,
+                "Mary" to 410f,
+                "David" to 230f
+            )
+
+            val maxVotes = results.maxOf { it.second }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Black)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+
+                        results.forEach { (name, votes) ->
+
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                Text(
+                                    text = votes.toInt().toString(),
+                                    color = Color(0xFFBA68C8),
+                                    fontSize = 10.sp
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height((votes / maxVotes * 140).dp)
+                                        .background(
+                                            brush = Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color(0xFFBA68C8),
+                                                    Color(0xFF6A1B9A)
+                                                )
+                                            ),
+                                            shape = RoundedCornerShape(6.dp)
+                                        )
+                                )
+
+                                Spacer(modifier = Modifier.height(6.dp))
+
+                                Text(
+                                    text = name,
+                                    color = Color.White,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
+        }
+    }
+}
 
-            // ACTION CARDS
-            ActionCard(
-                title = "View Candidates",
-                desc = "See all running candidates",
-                onClick = { navController.navigate(ROUTE_CANDIDATES) }
-            )
+/* ---------------- Reusable Card ---------------- */
 
-            ActionCard(
-                title = "View Results",
-                desc = "Check live voting results",
-                onClick = { navController.navigate(ROUTE_RESULTS) }
+@Composable
+fun ActionCard(title: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.height(90.dp),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFBA68C8))
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = title,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
             )
         }
     }
 }
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun DashboardPreview() {
+    DashboardScreen(rememberNavController())
+}
+

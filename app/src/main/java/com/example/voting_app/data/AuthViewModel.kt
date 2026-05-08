@@ -6,116 +6,126 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.voting_app.navigation.ROUTE_DASHBOARD
 import com.example.voting_app.navigation.ROUTE_LOGIN
-import com.example.voting_app.models.UserModel
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
-data class UserModel(
-    var username: String = "",
-    var email: String = "",
-    var userId: String = "",
-    var nationalId: String = ""
-)
-fun signup(
-    username: String,
-    email: String,
-    phone: String,
-    nationalId: String,
-    password: String,
-    confirmPassword: String,
-    navController: NavController,
-    context: Context
-) {
+class AuthViewModel : ViewModel() {
 
-    if (username.isBlank() || email.isBlank() || nationalId.isBlank()
-        || password.isBlank() || confirmPassword.isBlank()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val usersRef = FirebaseDatabase.getInstance().getReference("Users")
+    private val votesRef = FirebaseDatabase.getInstance().getReference("Votes")
+
+
+    fun signup(
+        username: String,
+        email: String,
+        nationalId: String,
+        password: String,
+        confirmPassword: String,
+        navController: NavController,
+        context: Context
     ) {
-        Toast.makeText(context, "All fields required", Toast.LENGTH_LONG).show()
-        return
-    }
 
-    if (password != confirmPassword) {
-        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
-        return
-    }
+        if (username.isBlank() || email.isBlank() || nationalId.isBlank()
+            || password.isBlank() || confirmPassword.isBlank()
+        ) {
+            toast(context, "All fields are required")
+            return
+        }
 
-    val dbRef = FirebaseDatabase.getInstance().getReference("Users")
+        if (password != confirmPassword) {
+            toast(context, "Passwords do not match")
+            return
+        }
 
-    // 🔐 Check duplicate National ID
-    dbRef.orderByChild("nationalId").equalTo(nationalId)
-        .get().addOnSuccessListener { snapshot ->
+        usersRef.orderByChild("nationalId").equalTo(nationalId)
+            .get()
+            .addOnSuccessListener { snapshot ->
 
-            if (snapshot.exists()) {
-                Toast.makeText(context, "National ID already registered", Toast.LENGTH_LONG).show()
-            } else {
+                if (snapshot.exists()) {
+                    toast(context, "National ID already registered")
+                } else {
 
-                auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
 
-                        if (task.isSuccessful) {
-                            val userId = auth.currentUser?.uid ?: ""
+                            if (task.isSuccessful) {
 
-                            val user = UserModel(
-                                username = username,
-                                email = email,
-                                userId = userId,
-                                nationalId = nationalId
-                            )
+                                val userId = auth.currentUser?.uid ?: ""
 
-                            saveUserToDatabase(user, navController, context)
+                                val userMap = hashMapOf(
+                                    "username" to username,
+                                    "email" to email,
+                                    "nationalId" to nationalId,
+                                    "userId" to userId
+                                )
 
-                        } else {
-                            Toast.makeText(
-                                context,
-                                task.exception?.message ?: "Registration failed",
-                                Toast.LENGTH_LONG
-                            ).show()
+                                usersRef.child(userId).setValue(userMap)
+                                    .addOnSuccessListener {
+                                        toast(context, "Registration successful")
+                                        navController.navigate(ROUTE_LOGIN)
+                                    }
+                                    .addOnFailureListener {
+                                        toast(context, "Failed to save user")
+                                    }
+
+                            } else {
+                                toast(context, task.exception?.message ?: "Signup failed")
+                            }
                         }
-                    }
+                }
             }
-        }
-}
-fun login(
-    email: String,
-    password: String,
-    navController: NavController,
-    context: Context
-) {
-
-    if (email.isBlank() || password.isBlank()) {
-        Toast.makeText(context, "Email and Password required", Toast.LENGTH_LONG).show()
-        return
     }
 
-    auth.signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
 
-            if (task.isSuccessful) {
+    fun login(
+        email: String,
+        password: String,
+        navController: NavController,
+        context: Context
+    ) {
 
-                val userId = auth.currentUser?.uid ?: ""
-
-                val voteRef = FirebaseDatabase.getInstance()
-                    .getReference("Votes")
-                    .child(userId)
-
-                voteRef.get().addOnSuccessListener { snapshot ->
-
-                    if (snapshot.exists()) {
-                        Toast.makeText(context, "You already voted", Toast.LENGTH_LONG).show()
-                        navController.navigate("results")
-                    } else {
-                        navController.navigate("ballot")
-                    }
-                }
-
-            } else {
-                Toast.makeText(
-                    context,
-                    task.exception?.message ?: "Login failed",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+        if (email.isBlank() || password.isBlank()) {
+            toast(context, "Email and Password required")
+            return
         }
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+
+                if (task.isSuccessful) {
+
+                    val userId = auth.currentUser?.uid ?: ""
+
+
+                    votesRef.child(userId).get()
+                        .addOnSuccessListener { snapshot ->
+
+                            if (snapshot.exists()) {
+                                toast(context, "You already voted")
+                                navController.navigate("results")
+                            } else {
+                                navController.navigate(ROUTE_DASHBOARD)
+                            }
+                        }
+
+                } else {
+                    toast(context, task.exception?.message ?: "Login failed")
+                }
+            }
+    }
+
+    fun logout(navController: NavController, context: Context) {
+        auth.signOut()
+        toast(context, "Logged out successfully")
+        navController.navigate(ROUTE_LOGIN) {
+            popUpTo(0)
+        }
+    }
+
+
+    private fun toast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
 }
-
-
