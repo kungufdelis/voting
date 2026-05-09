@@ -1,4 +1,4 @@
-package com.example.votingsystem.screens.dashboard
+package com.example.voting_app.ui.theme.screens.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,18 +24,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
 import com.example.voting_app.data.AuthViewModel
+
+@Composable
+fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+    val context = LocalContext.current
+    DashboardContent(
+        onLogout = { authViewModel.logout(navController, context) }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController) {
-
-    var selectedItem by remember { mutableStateOf(0) }
-
-    val authViewModel: AuthViewModel = viewModel()
-    val context = LocalContext.current
+fun DashboardContent(
+    onLogout: () -> Unit = {}
+) {
+    var selectedItem by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
@@ -48,9 +52,7 @@ fun DashboardScreen(navController: NavController) {
                     )
                 },
                 actions = {
-                    IconButton(onClick = {
-                        authViewModel.logout(navController, context)
-                    }) {
+                    IconButton(onClick = onLogout) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = "Logout",
@@ -227,8 +229,6 @@ fun DashboardScreen(navController: NavController) {
     }
 }
 
-/* ---------------- Reusable Card ---------------- */
-
 @Composable
 fun ActionCard(title: String, modifier: Modifier = Modifier) {
     Card(
@@ -253,6 +253,5 @@ fun ActionCard(title: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DashboardPreview() {
-    DashboardScreen(rememberNavController())
+    DashboardContent()
 }
-

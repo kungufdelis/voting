@@ -1,36 +1,58 @@
 package com.example.voting_app.ui.theme.screens.update
 
-import android.R.attr.password
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.voting_app.navigation.ROUTE_UPDATE_CANDIDATE
+import com.example.voting_app.ui.theme.VotingappTheme
 
 @Composable
 fun UpdateCandidateScreen(
     navController: NavController,
     candidateId: String
 ) {
+    UpdateCandidateContent(
+        candidateId = candidateId,
+        onUpdateClick = { name, position ->
+            // Handle update logic here
+            navController.popBackStack()
+        }
+    )
+}
 
+@Composable
+fun UpdateCandidateContent(
+    candidateId: String,
+    onUpdateClick: (String, String) -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var position by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Text(
-            text = "Update Candidate: $candidateId",
-            style = MaterialTheme.typography.headlineMedium
+            text = "Update Candidate",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Candidate ID: $candidateId",
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
             value = name,
@@ -39,7 +61,7 @@ fun UpdateCandidateScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = position,
@@ -48,19 +70,26 @@ fun UpdateCandidateScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
-
+        Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = {
-                val voteId = ""
-                navController.navigate("$ROUTE_UPDATE_CANDIDATE/$voteId")
-            },
+            onClick = { onUpdateClick(name, position) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Update Candidate")
         }
     }
+}
 
-
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun UpdateCandidatePreview() {
+    VotingappTheme {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            UpdateCandidateContent(
+                candidateId = "SAMPLE-123",
+                onUpdateClick = { _, _ -> }
+            )
+        }
     }
+}

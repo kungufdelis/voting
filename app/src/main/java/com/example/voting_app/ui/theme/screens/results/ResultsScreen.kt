@@ -9,7 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.voting_app.navigation.ROUTE_DASHBOARD
-import com.example.votingapp.ui.screens.RegisterScreen
 
 @Composable
 fun ResultsScreen(

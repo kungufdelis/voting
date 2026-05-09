@@ -7,14 +7,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.voting_app.ui.theme.screens.addcandidate.AddCandidateScreen
+import com.example.voting_app.ui.theme.screens.dashboard.DashboardScreen
+import com.example.voting_app.ui.theme.screens.login.LoginScreen
 import com.example.voting_app.ui.theme.screens.results.ResultsScreen
 import com.example.voting_app.ui.theme.screens.update.UpdateCandidateScreen
 import com.example.voting_app.ui.theme.screens.view.ViewCandidateScreen
 import com.example.voting_app.ui.theme.screens.votedetail.VoteDetailScreen
 import com.example.voting_app.ui.theme.screens.votelist.VoteListScreen
 import com.example.votingapp.ui.screens.RegisterScreen
-import com.example.votingsystem.screens.dashboard.DashboardScreen
-import com.example.votingsystem.screens.login.LoginScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
