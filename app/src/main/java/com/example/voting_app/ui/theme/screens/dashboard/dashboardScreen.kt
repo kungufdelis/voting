@@ -1,6 +1,7 @@
 package com.example.voting_app.ui.theme.screens.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,11 +26,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.voting_app.data.AuthViewModel
+import com.example.voting_app.navigation.*
 
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
     DashboardContent(
+        navController = navController,
         onLogout = { authViewModel.logout(navController, context) }
     )
 }
@@ -37,6 +40,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardContent(
+    navController: NavController = rememberNavController(),
     onLogout: () -> Unit = {}
 ) {
     var selectedItem by remember { mutableIntStateOf(0) }
@@ -108,7 +112,8 @@ fun DashboardContent(
 
             // Votes Summary Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .clickable { navController.navigate(ROUTE_VOTE_LIST) },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Black)
             ) {
@@ -121,7 +126,7 @@ fun DashboardContent(
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text("Active Election: 2026 Student Leader", color = Color(0xFFBA68C8))
+                    Text("Tap here to cast your vote!", color = Color(0xFFBA68C8))
                 }
             }
 
@@ -132,8 +137,12 @@ fun DashboardContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ActionCard("Add Candidate", Modifier.weight(1f))
-                ActionCard("View Candidates", Modifier.weight(1f))
+                ActionCard("Add Candidate", Modifier.weight(1f)) {
+                    navController.navigate(ROUTE_ADD_CANDIDATE)
+                }
+                ActionCard("View Candidates", Modifier.weight(1f)) {
+                    navController.navigate(ROUTE_VIEW_CANDIDATE)
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -142,8 +151,13 @@ fun DashboardContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ActionCard("Update Candidate", Modifier.weight(1f))
-                ActionCard("Results", Modifier.weight(1f))
+                ActionCard("Update Candidate", Modifier.weight(1f)) {
+                    // Navigate with a dummy ID or list first
+                    navController.navigate(ROUTE_VIEW_CANDIDATE) 
+                }
+                ActionCard("Results", Modifier.weight(1f)) {
+                    navController.navigate("$ROUTE_RESULTS/all")
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -230,9 +244,11 @@ fun DashboardContent(
 }
 
 @Composable
-fun ActionCard(title: String, modifier: Modifier = Modifier) {
+fun ActionCard(title: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
-        modifier = modifier.height(90.dp),
+        modifier = modifier
+            .height(90.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFBA68C8))
     ) {

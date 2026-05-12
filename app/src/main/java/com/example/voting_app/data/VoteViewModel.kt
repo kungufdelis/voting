@@ -112,6 +112,25 @@ class VoteViewModel : ViewModel() {
             }
     }
 
+    private val _candidates = mutableStateListOf<CandidateModel>()
+    val candidates: List<CandidateModel> = _candidates
+
+    fun fetchCandidates(context: Context) {
+        candidatesRef.get()
+            .addOnSuccessListener { snapshot ->
+                _candidates.clear()
+                for (child in snapshot.children) {
+                    val candidate = child.getValue(CandidateModel::class.java)
+                    if (candidate != null) {
+                        _candidates.add(candidate)
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to load candidates", Toast.LENGTH_LONG).show()
+            }
+    }
+
     fun clearVotes(context: Context) {
         votesRef.removeValue()
             .addOnSuccessListener {
