@@ -16,9 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.voting_app.data.VoteViewModel
+import com.example.voting_app.models.CandidateModel
 import com.example.voting_app.navigation.ROUTE_UPDATE_CANDIDATE
+import com.example.voting_app.ui.theme.VotingappTheme
 
 @Composable
 fun ViewCandidateScreen(navController: NavController, viewModel: VoteViewModel = viewModel()) {
@@ -29,6 +30,19 @@ fun ViewCandidateScreen(navController: NavController, viewModel: VoteViewModel =
         viewModel.fetchCandidates(context)
     }
 
+    ViewCandidateContent(
+        candidates = candidates,
+        onUpdateClick = { candidateId ->
+            navController.navigate("$ROUTE_UPDATE_CANDIDATE/$candidateId")
+        }
+    )
+}
+
+@Composable
+fun ViewCandidateContent(
+    candidates: List<CandidateModel>,
+    onUpdateClick: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +65,7 @@ fun ViewCandidateScreen(navController: NavController, viewModel: VoteViewModel =
                 CandidateItem(
                     name = candidate.name,
                     onUpdateClick = {
-                        navController.navigate("$ROUTE_UPDATE_CANDIDATE/${candidate.id}")
+                        onUpdateClick(candidate.id)
                     }
                 )
             }
@@ -109,5 +123,20 @@ fun CandidateItem(name: String, onUpdateClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun ViewCandidateScreenPreview() {
-    ViewCandidateScreen(navController = rememberNavController())
+    VotingappTheme {
+        val mockCandidates = listOf(
+            CandidateModel(id = "1", name = "Alice"),
+            CandidateModel(id = "2", name = "John"),
+            CandidateModel(id = "3", name = "Mary")
+        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            ViewCandidateContent(
+                candidates = mockCandidates,
+                onUpdateClick = {}
+            )
+        }
+    }
 }

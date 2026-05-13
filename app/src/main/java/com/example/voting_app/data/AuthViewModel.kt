@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.voting_app.navigation.ROUTE_DASHBOARD
 import com.example.voting_app.navigation.ROUTE_LOGIN
+import com.example.voting_app.navigation.ROUTE_RESULTS
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -67,7 +68,7 @@ class AuthViewModel : ViewModel() {
                                         navController.navigate(ROUTE_LOGIN)
                                     }
                                     .addOnFailureListener {
-                                        toast(context, "Failed to save user")
+                                        toast(context, "Failed to save user info")
                                     }
 
                             } else {
@@ -75,6 +76,9 @@ class AuthViewModel : ViewModel() {
                             }
                         }
                 }
+            }
+            .addOnFailureListener {
+                toast(context, "Database error: ${it.message}")
             }
     }
 
@@ -95,23 +99,31 @@ class AuthViewModel : ViewModel() {
             .addOnCompleteListener { task ->
 
                 if (task.isSuccessful) {
-
                     val userId = auth.currentUser?.uid ?: ""
 
-
+                    // Check if user has already voted
                     votesRef.child(userId).get()
                         .addOnSuccessListener { snapshot ->
-
                             if (snapshot.exists()) {
-                                toast(context, "You already voted")
-                                navController.navigate("results")
+                                toast(context, "Welcome back! You already voted.")
+                                // Corrected navigation to include the required argument
+                                navController.navigate("$ROUTE_RESULTS/all") {
+                                    popUpTo(ROUTE_LOGIN) { inclusive = true }
+                                }
                             } else {
-                                navController.navigate(ROUTE_DASHBOARD)
+                                navController.navigate(ROUTE_DASHBOARD) {
+                                    popUpTo(ROUTE_LOGIN) { inclusive = true }
+                                }
                             }
+                        }
+                        .addOnFailureListener {
+                            // If DB check fails, still allow them to see the dashboard
+                            navController.navigate(ROUTE_DASHBOARD)
                         }
 
                 } else {
-                    toast(context, task.exception?.message ?: "Login failed")
+                    val errorMessage = task.exception?.message ?: "Login failed"
+                    toast(context, errorMessage)
                 }
             }
     }

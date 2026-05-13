@@ -18,7 +18,7 @@ import com.example.voting_app.ui.theme.VotingappTheme
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: () -> Unit, // Still kept for compatibility, but AuthViewModel handles navigation
     onNavigateToRegister: () -> Unit,
     navController: NavController = rememberNavController(),
     authViewModel: AuthViewModel = viewModel()
@@ -27,8 +27,8 @@ fun LoginScreen(
 
     LoginContent(
         onLogin = { email, password ->
+            // AuthViewModel.login already handles navigation to Dashboard on success
             authViewModel.login(email, password, navController, context)
-            onLoginSuccess()
         },
         onNavigateToRegister = onNavigateToRegister
     )
